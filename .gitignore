@@ -2,6 +2,9 @@
 coverage
 coverage.data
 
+# Lock
+Gemfile.lock
+
 # rdoc generated
 rdoc
 
