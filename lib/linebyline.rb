@@ -49,6 +49,10 @@ module LineByLine
   class NotSame < RuntimeError
   end
   
+  # Compares two passed String or IO objects for equal content.
+  # If the contents does not match, a NotSame exception will be raised, and
+  # it's +NotSame#message+ will contain a very specific description of the mismatch,
+  # including the line number and offset into the line.
   def compare_buffers!(expected, actual)
     
     if expected.object_id == actual.object_id

@@ -19,7 +19,18 @@ The Assertions module expects the following methods on the object it is included
   flunk(message)
   assert(boolean)
   
-so you can retrofit it to your Testing Framework Du Jour.
+so you can retrofit it to your Testing Framework Du Jour. Or you can include LineByLine itself,
+and then use +compare_buffer!+ like so:
+  
+  include LineByLine
+  
+  # ... more tests
+  begin
+    compare_buffers! ref, out
+  rescue LineByLine::NotSame => mismatch
+    fail_test mismatch.message
+  end
+
 
 == Contributing to linebyline
  
