@@ -1,6 +1,6 @@
 module LineByLine
   
-  VERSION = '1.0.0'
+  VERSION = '1.0.1'
   
   # The class that handles the actual checks between two lines
   class Checker < Struct.new(:lineno, :ref_line, :output_line)
@@ -62,6 +62,11 @@ module LineByLine
     # Wrap the passed strings in IOs if necessary
     reference_io, io_under_test = [expected, actual].map do | str_or_io |
       str_or_io.respond_to?(:gets) ? str_or_io : StringIO.new(str_or_io)
+    end
+    
+    # Compare positions (helps catch situations where one thing is rewound and the other is not)
+    if reference_io.pos != io_under_test.pos
+      raise NotSame, 'The passed IO objects were at different seek offsets (expected: %d, actual: %d)' % [ reference_io.pos, io_under_test.pos]
     end
     
     # There are subtle differences in how IO is handled on dfferent platforms (Darwin)

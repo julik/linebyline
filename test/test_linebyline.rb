@@ -18,6 +18,18 @@ class TestLinebyline < Test::Unit::TestCase
     end
   end
   
+  def test_raises_on_pos_difference
+    s = "Welcome to the house of fun"
+    a = StringIO.new(s)
+    a.seek(3)
+    
+    b = StringIO.new(s)
+    
+    assert_mismatch  a, b do | msg |
+      assert_match /The passed IO objects were at different seek offsets \(expected: 3, actual: 0\)/, msg
+    end
+  end
+  
   def test_raises_on_mismatch
     same = StringIO.new('dude')
     assert_mismatch  same, same do | msg |
