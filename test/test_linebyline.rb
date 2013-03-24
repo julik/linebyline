@@ -12,6 +12,12 @@ class TestLinebyline < Test::Unit::TestCase
     compare_buffers! ref, another
   end
   
+  def test_works_with_string_and_io
+    assert_mismatch  'foo', 'foobar' do | msg |
+      assert_match /Lines have different lengths \(3 expected, but was 6\)/, msg
+    end
+  end
+  
   def test_raises_on_mismatch
     same = StringIO.new('dude')
     assert_mismatch  same, same do | msg |

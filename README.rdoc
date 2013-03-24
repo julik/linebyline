@@ -1,6 +1,19 @@
 = linebyline
 
-Description goes here.
+Facilitates the comparison of files and IO buffers in tests. It will report the exact differences per line and character offset, it will report if
+lines are too short or too long, and so on.
+
+To use, include it in Minitest or Test::Unit
+
+    include LineByLine::Assertions
+    
+    ...
+    def test_outputs_same
+      ref = File.open('ref_data.txt')
+      out = generator.write
+      assert_same_buffer ref, out
+    end
+  
 
 == Contributing to linebyline
  

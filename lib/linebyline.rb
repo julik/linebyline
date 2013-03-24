@@ -1,5 +1,8 @@
 module LineByLine
   
+  VERSION = '1.0.0'
+  
+  # The class that handles the actual checks between two lines
   class Checker < Struct.new(:lineno, :ref_line, :output_line)
     
     attr_reader :failure
@@ -26,14 +29,17 @@ module LineByLine
       end
     end
     
+    # Returns true if both lines are nil
     def eof?
       ref_line.nil? && output_line.nil?
     end
     
+    # Records the failure and the details on where it occurred in the buffer
+    # into the @failure ivar
     def fail! with_message
       full_message = [with_message + " at line #{lineno}"]
-      full_message << " + #{ref_line}"
-      full_message << " - #{output_line}"
+      full_message << " + #{ref_line.inspect}"
+      full_message << " - #{output_line.inspect}"
       
       @failure = full_message.join("\n")
       throw :fail
@@ -43,13 +49,16 @@ module LineByLine
   class NotSame < RuntimeError
   end
   
-  def compare_buffers!(reference_io, io_under_test)
+  def compare_buffers!(expected, actual)
     
-    if reference_io.object_id == io_under_test.object_id
+    if expected.object_id == actual.object_id
       raise NotSame, /The passed IO objects were the same thing/
     end
     
-    [reference_io, io_under_test].each{|io| io.rewind }
+    # Wrap the passed strings in IOs if necessary
+    reference_io, io_under_test = [expected, actual].map do | str_or_io |
+      str_or_io.respond_to?(:gets) ? str_or_io : StringIO.new(str_or_io)
+    end
     
     # There are subtle differences in how IO is handled on dfferent platforms (Darwin)
     lineno = 0
@@ -65,5 +74,20 @@ module LineByLine
         raise NotSame, checker.failure if checker.failure
       end
     end
-  end  
+  end 
+  
+  module Assertions
+    def self.included(into)
+      into.send(:include, LineByLine)
+    end
+    
+    def assert_same_buffer(ref_buffer, actual_buffer, message = "The line should be identical but was not")
+      begin
+        compare_buffers! ref_buffer, actual_buffer
+        assert true
+      rescue NotSame => e
+        flunk [message, e.message].join("\n")
+      end
+    end
+  end
 end
