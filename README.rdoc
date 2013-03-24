@@ -7,13 +7,19 @@ To use, include it in Minitest or Test::Unit
 
     include LineByLine::Assertions
     
-    ...
+    # ... and in one of your tests
     def test_outputs_same
       ref = File.open('ref_data.txt')
-      out = generator.write
+      out = File.open('my_output.txt')
       assert_same_buffer ref, out
     end
+
+The Assertions module expects the following methods on the object it is included into:
+
+  flunk(message)
+  assert(boolean)
   
+so you can retrofit it to your Testing Framework Du Jour.
 
 == Contributing to linebyline
  
